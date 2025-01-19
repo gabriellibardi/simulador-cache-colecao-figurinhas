@@ -1,5 +1,5 @@
 class MemoriaCache:
-    def __init__(self, tamanho):
+    def __init__(self, tamanho: int):
         self.tamanho = tamanho
         self.memoria = [0] * tamanho
     

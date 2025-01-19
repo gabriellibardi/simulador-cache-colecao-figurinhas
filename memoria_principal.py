@@ -1,5 +1,5 @@
 class MemoriaPrincipal:
-    def __init__(self, tamanho):
+    def __init__(self, tamanho: int):
         self.tamanho = tamanho
         self.memoria = [0] * tamanho
 
@@ -18,5 +18,5 @@ class MemoriaPrincipal:
     def __repr__(self):
         buffer = ''
         for i in range(self.tamanho):
-            buffer += '{:>3} {:<}\n'.format(str(i), str(self.memoria[i]))
+            buffer += '\033[34m{:>3} \033[00m{:<}\n'.format(str(i), str(self.memoria[i]))
         return buffer

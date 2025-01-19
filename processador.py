@@ -11,6 +11,12 @@ class Processador:
         '''
         Executa a lógica do processador.
         '''
-        print(f"Processador {self.id} executando...")
-        # Código para executar a lógica do processador...
+        print(f"Processador {self.id} executando...\n")
+        
+        print(">>> Escolha a operação:\n")
+        print("1: Ler")
+        print("2: Escrever")
+        print("q: Sair")
+        escolha = input("\n> ")
+
         print("Processador finalizado.")
