@@ -5,14 +5,15 @@ import random
 import figurinhas
 
 TAMANHO_MEMORIA_PRINCIPAL = 50
-TAMANHO_CACHE = 5
+TAMANHO_CACHE = 10
+TAMANHO_LINHA_CACHE = 5
 QUANTIDADE_PROCESSADORES = 3
 
 def main():
     # Inicializa os componentes
-    memoria_principal = MemoriaPrincipal(TAMANHO_MEMORIA_PRINCIPAL)
-    caches = [MemoriaCache(TAMANHO_CACHE) for _ in range(QUANTIDADE_PROCESSADORES)]
-    processadores = [Processador(i, cache, memoria_principal) for i, cache in enumerate(caches)]
+    memoria_principal = MemoriaPrincipal(TAMANHO_MEMORIA_PRINCIPAL, TAMANHO_LINHA_CACHE)
+    caches = [MemoriaCache(TAMANHO_CACHE, TAMANHO_LINHA_CACHE) for _ in range(1, QUANTIDADE_PROCESSADORES + 1)]
+    processadores = [Processador(i + 1, cache, memoria_principal) for i, cache in enumerate(caches)]
 
     # Cria as figurinhas e preenche a memória principal
     total_figurinhas = figurinhas.cria_figurinhas(TAMANHO_MEMORIA_PRINCIPAL * 2)
@@ -21,24 +22,23 @@ def main():
     # Interface do usuário
     print("\033[92m-=-=-=-=-=-= SIMULADOR DE COLEÇÃO COMPARTILHADA DE FIGURINHAS =-=-=-=-=-=-\033[00m\n")
     while True:
-
         print(">>> Escolha um usuário para acessar:\n")
-        for i in range(QUANTIDADE_PROCESSADORES):
+        for i in range(1, QUANTIDADE_PROCESSADORES + 1):
             print(f"{i}: Usuário {i}")
-        print("c: Mostrar coleção")
+        print("m: Mostrar coleção")
         print("q: Sair")
         escolha = input("\n> ")
         print()
 
         if escolha == 'q':
             break
-        elif escolha == 'c':
+        elif escolha == 'm':
             print("Memória principal:\n")
             print(memoria_principal)
         else:
             try:
                 escolha = int(escolha)
-                processador = processadores[escolha]
+                processador = processadores[escolha - 1]
             except (ValueError, IndexError):
                 print("Opção inválida.")
                 print('\n' + '-' * 60)
