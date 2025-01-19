@@ -20,13 +20,13 @@ def main():
     preencher_colecao(memoria_principal, total_figurinhas)
 
     # Interface do usuário
-    print("\033[92m-=-=-=-=-=-= SIMULADOR DE COLEÇÃO COMPARTILHADA DE FIGURINHAS =-=-=-=-=-=-\033[00m\n")
+    print("\n\033[92m-=-=-=-=-=-= SIMULADOR DE COLEÇÃO COMPARTILHADA DE FIGURINHAS =-=-=-=-=-=-\033[00m\n")
     while True:
         print(">>> Escolha um usuário para acessar:\n")
         for i in range(1, QUANTIDADE_PROCESSADORES + 1):
-            print(f"{i}: Usuário {i}")
-        print("m: Mostrar coleção")
-        print("q: Sair")
+            print(f"\033[93m{i}:\033[00m Usuário {i}")
+        print("\033[93mm:\033[00m Mostrar coleção")
+        print("\033[93mq:\033[00m Sair")
         escolha = input("\n> ")
         print()
 

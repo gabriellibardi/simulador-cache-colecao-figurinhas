@@ -3,7 +3,7 @@ class MemoriaPrincipal:
         self.tamanho = tamanho
         self.tamanho_bloco = tamanho_bloco
         self.memoria = [0] * tamanho
-    
+
     def ler(self, endereco: int):
         '''
         Retorna o dado no *endereço* da memória.
@@ -19,6 +19,13 @@ class MemoriaPrincipal:
         if endereço >= self.tamanho:
             raise ValueError(f"Endereço {endereço} fora dos limites da memória.")
         self.memoria[endereço] = dado
+
+    def buscar_bloco(self, endereco: int):
+        '''
+        Retorna o bloco que contenha o *endereço*.
+        '''
+        return self.memoria[self.tamanho_bloco * (endereco // self.tamanho_bloco): self.tamanho_bloco * (endereco // self.tamanho_bloco + 1)]
+        
 
     def __repr__(self):
         buffer = ''
