@@ -8,6 +8,10 @@ class Estado(Enum):
     INVALID = "Invalid"
     FORWARD = "Forward"
 
+class Resposta:
+    HIT = "\033[92mHit\033[00m"
+    MISS = "\033[91mMiss\033[00m"    
+
 class Linha:
     def __init__(self, tag, dados, estado):
         self.tag = tag
@@ -32,15 +36,15 @@ class MemoriaCache:
 
     def ler(self, endereco: int):
         '''
-        Lê o dado no *endereço* da memória principal.
-        Caso a cache não possua a linha que armazena o *endereço*, retorna um erro.
+        Lê o dado no *endereço* da memória principal e se encontrar, retorna HIT.
+        Caso a cache não possua a linha que armazena o *endereço*, retorna MISS.
         '''
         tag = endereco // self.tamanho_linha
         posicao = endereco % self.tamanho_linha
         for i in range(self.qnt_linhas):
             if self.memoria[i].tag == tag:
-                return self.memoria[i].dados[posicao]
-        raise ValueError(f"Linha {tag} não encontrada na cache.")
+                return self.memoria[i].dados[posicao], Resposta.HIT
+        return None, Resposta.MISS
     
     def carregar_linha(self, bloco, endereco: int):
         '''

@@ -1,16 +1,12 @@
-from memoria_cache import MemoriaCache
+from memoria_cache import MemoriaCache, Resposta, Estado
 from memoria_principal import MemoriaPrincipal
-from enum import Enum
-
-class Resposta:
-    HIT = "\033[92mHit\033[00m"
-    MISS = "\033[91mMiss\033[00m"
 
 class Processador:
-    def __init__(self, id: int, cache: MemoriaCache, memoria_principal: MemoriaPrincipal):
+    def __init__(self, id: int, cache: MemoriaCache, memoria_principal: MemoriaPrincipal, sistema):
         self.id = id
         self.cache = cache
         self.memoria_principal = memoria_principal
+        self.sistema = sistema
 
     def executar(self):
         '''
@@ -38,11 +34,14 @@ class Processador:
                 print("Memória principal:\n")
                 print(self.memoria_principal)
             elif escolha == '1':
-                endereco = int(input("Endereço: "))
-                print()
-                resultado = self.ler(endereco)
-                print(resultado[1])
-                print(f"Valor: {resultado[0]}")
+                try:
+                    endereco = int(input("Endereço: "))
+                    print()
+                    resultado = self.ler(endereco)
+                    print(resultado[1])
+                    print(f"Valor: {resultado[0]}")
+                except:
+                    print("\n\033[91mEndereço Inválido.\033[00m")
             elif escolha == '2':
                 endereco = int(input("Endereço: "))
                 dado = input("Dado: ")
@@ -51,15 +50,25 @@ class Processador:
                 print(resultado[1])
                 print(f"Valor: {resultado[0]}")
             else:
-                print("Opção inválida.")
+                print("\n\033[91mOpção Inválida.\033[00m")
 
     def ler(self, endereco: int):
         '''
         Lê um dado no *endereco* da memória.
         '''
-        try:
-            return self.cache.ler(endereco), Resposta.HIT
-        except:
+        resposta = self.cache.ler(endereco)
+        if resposta[1] == Resposta.HIT:
+            return resposta
+        else: # MISS
+            # Procura o bloco nas caches dos outros processadores
+            for cache in self.sistema.caches:
+                if cache != self.cache:
+                    resposta = cache.ler(endereco)
+                    if resposta[1] == Resposta.HIT:
+                        # Atualiza a cache do processador atual com o bloco encontrado
+                        
+                        return resposta
+            # Se não encontrar o bloco nas caches dos outros processadores, busca na memória principal
             self.cache.carregar_linha(self.memoria_principal.buscar_bloco(endereco), endereco)
             return self.memoria_principal.ler(endereco), Resposta.MISS
     
