@@ -24,15 +24,19 @@ class Processador:
             escolha = input("\n> ")
             print()
 
-            if escolha == 'q':
+            # Voltar
+            if escolha == 'q': 
                 print("Processador finalizado.\n")
                 return
+            # Mostrar cache
             elif escolha == 'c':
                 print(f"Cache {self.id}:\n")
                 print(self.cache)
+            # Mostrar memória principal
             elif escolha == 'm':
                 print("Memória principal:\n")
                 print(self.memoria_principal)
+            # Ler
             elif escolha == '1':
                 try:
                     endereco = int(input("Endereço: "))
@@ -41,6 +45,7 @@ class Processador:
                     print(f"\nValor: {resultado}")
                 except:
                     print("\n\033[91mEndereço Inválido.\033[00m")
+            # Escrever
             elif escolha == '2':
                 endereco = int(input("Endereço: "))
                 dado = input("Dado: ")
@@ -67,16 +72,16 @@ class Processador:
                     resposta = cache.procurar_linha(endereco)
                     if resposta is not None:
                         print("Bloco encontrado na cache de outro processador.")
-                        if resposta.estado == Estado.FORWARD:
+                        if resposta.estado == Estado.FORWARD: # Mais de uma cache possui o bloco
                             self.cache.carregar_linha(resposta.dados, endereco, Estado.SHARED)
-                        elif resposta.estado == Estado.EXCLUSIVE:
+                        elif resposta.estado == Estado.EXCLUSIVE: # Uma única cache possui o bloco
                             self.cache.carregar_linha(resposta.dados, endereco, Estado.SHARED)
                             resposta.estado = Estado.FORWARD
-                        elif resposta.estado == Estado.MODIFIED:
+                        elif resposta.estado == Estado.MODIFIED: # Uma única cache possui o bloco e está modificando
                             self.memoria_principal.atualiza_bloco(resposta.dados, endereco)
                             resposta.estado = Estado.FORWARD
                             self.cache.carregar_linha(resposta.dados, endereco, Estado.SHARED)
-                        return cache.ler(endereco)[0]    
+                        return cache.ler(endereco)[0]
             # Se não encontrar o bloco nas caches dos outros processadores, busca na memória principal
             print("Buscando bloco na memória principal...")
             self.cache.carregar_linha(self.memoria_principal.buscar_bloco(endereco), endereco, Estado.EXCLUSIVE)

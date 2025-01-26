@@ -26,6 +26,7 @@ class MemoriaCache:
         self.tamanho_linha = tamanho_linha
         self.qnt_linhas = tamanho // tamanho_linha
         self.memoria = [Linha() for _ in range(self.qnt_linhas)]
+        self.fila = []
     
     def __repr__(self):
         buffer = ''
@@ -66,8 +67,17 @@ class MemoriaCache:
                 self.memoria[i].tag = tag
                 self.memoria[i].dados = bloco
                 self.memoria[i].estado = estado
+                self.fila.append(tag)
                 return
-        self._fifo(tag)
+        # Se a cache estiver cheia, aplica a política de substituição FIFO
+        tag_antiga = self.fila.pop(0)
+        for i in range(self.qnt_linhas):
+            if self.memoria[i].tag == tag_antiga:
+                self.memoria[i].tag = tag
+                self.memoria[i].dados = bloco
+                self.memoria[i].estado = estado
+                self.fila.append(tag)
+                return
 
     def envia_memoria(self, endereco: int):
         '''
