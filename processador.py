@@ -47,13 +47,19 @@ class Processador:
                     print("\n\033[91mEndereço Inválido.\033[00m")
             # Escrever
             elif escolha == '2':
-                endereco = int(input("Endereço: "))
-                dado = input("Dado: ")
+                try:
+                    endereco = int(input("Endereço: "))
+                    if endereco >= self.memoria_principal.tamanho:
+                        raise ValueError(f"Endereço {endereco} fora dos limites da memória.")
+                except:
+                    print("\n\033[91mEndereço Inválido.\033[00m")
+                dado = input(f"Número da figurinha (1 até {len(self.sistema.total_figurinhas)}): ")
+                if not dado.isdigit() or int(dado) < 1 or int(dado) > len(self.sistema.total_figurinhas):
+                    print("\n\033[91mNúmero da figurinha inválido.\033[00m")
+                figurinha = self.sistema.total_figurinhas[int(dado) - 1]
                 print()
-                self.escrever(endereco, dado)
-                print(f"\nValor escrito: {dado}")
-
-                # print("\n\033[91mEndereço Inválido.\033[00m")
+                self.escrever(endereco, figurinha)
+                print(f"\nValor escrito: {figurinha}")
             else:
                 print("\n\033[91mOpção Inválida.\033[00m")
 

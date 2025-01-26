@@ -8,11 +8,13 @@ TAMANHO_LINHA_CACHE = 5
 QUANTIDADE_PROCESSADORES = 3
 
 def main():
-    # Inicializa o sistema
-    sistema = Sistema(QUANTIDADE_PROCESSADORES, TAMANHO_MEMORIA_PRINCIPAL, TAMANHO_CACHE, TAMANHO_LINHA_CACHE)
-
-    # Cria as figurinhas e preenche a memória principal
+    # Cria as figurinhas
     total_figurinhas = figurinhas.cria_figurinhas(TAMANHO_MEMORIA_PRINCIPAL * 2)
+
+    # Inicializa o sistema
+    sistema = Sistema(QUANTIDADE_PROCESSADORES, TAMANHO_MEMORIA_PRINCIPAL, TAMANHO_CACHE, TAMANHO_LINHA_CACHE, total_figurinhas)
+
+    # Preenche a memória principal com figurinhas aleatórias
     preencher_colecao(sistema.memoria_principal, total_figurinhas)
 
     # Executa o sistema

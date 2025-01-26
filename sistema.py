@@ -3,10 +3,11 @@ from memoria_cache import MemoriaCache
 from processador import Processador
 
 class Sistema:
-    def __init__(self, quantidade_processadores, tamanho_memoria_principal, tamanho_cache, tamanho_linha_cache):
+    def __init__(self, quantidade_processadores, tamanho_memoria_principal, tamanho_cache, tamanho_linha_cache, total_figurinhas):
         self.memoria_principal = MemoriaPrincipal(tamanho_memoria_principal, tamanho_linha_cache)
         self.caches = [MemoriaCache(tamanho_cache, tamanho_linha_cache) for _ in range(quantidade_processadores)]
         self.processadores = [Processador(i + 1, cache, self.memoria_principal, self) for i, cache in enumerate(self.caches)]
+        self.total_figurinhas = total_figurinhas
 
     def executar(self):
         print("\n\033[92m-=-=-=-=-=-= SIMULADOR DE COLEÇÃO COMPARTILHADA DE FIGURINHAS =-=-=-=-=-=-\033[00m\n")
