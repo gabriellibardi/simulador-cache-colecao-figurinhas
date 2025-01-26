@@ -25,7 +25,7 @@ class Processador:
             print()
 
             if escolha == 'q':
-                print("Processador finalizado.")
+                print("Processador finalizado.\n")
                 return
             elif escolha == 'c':
                 print(f"Cache {self.id}:\n")
@@ -38,8 +38,7 @@ class Processador:
                     endereco = int(input("Endereço: "))
                     print()
                     resultado = self.ler(endereco)
-                    print(resultado[1])
-                    print(f"Valor: {resultado[0]}")
+                    print(f"\nValor: {resultado}")
                 except:
                     print("\n\033[91mEndereço Inválido.\033[00m")
             elif escolha == '2':
@@ -47,8 +46,7 @@ class Processador:
                 dado = input("Dado: ")
                 print()
                 resultado = self.escrever(endereco, dado)
-                print(resultado[1])
-                print(f"Valor: {resultado[0]}")
+                print(f"\nValor: {resultado}")
             else:
                 print("\n\033[91mOpção Inválida.\033[00m")
 
@@ -58,19 +56,31 @@ class Processador:
         '''
         resposta = self.cache.ler(endereco)
         if resposta[1] == Resposta.HIT:
-            return resposta
+            print("\033[92mHit\033[00m")
+            return resposta[0]
         else: # MISS
+            print("\033[91mMiss\033[00m")
             # Procura o bloco nas caches dos outros processadores
+            print("\nBuscando bloco nas outras caches...")
             for cache in self.sistema.caches:
-                if cache != self.cache:
-                    resposta = cache.ler(endereco)
-                    if resposta[1] == Resposta.HIT:
-                        # Atualiza a cache do processador atual com o bloco encontrado
-                        
-                        return resposta
+                if cache != self.cache: # Evita a busca na própria cache
+                    resposta = cache.procurar_linha(endereco)
+                    if resposta is not None:
+                        print("Bloco encontrado na cache de outro processador.")
+                        if resposta.estado == Estado.FORWARD:
+                            self.cache.carregar_linha(resposta.dados, endereco, Estado.SHARED)
+                        elif resposta.estado == Estado.EXCLUSIVE:
+                            self.cache.carregar_linha(resposta.dados, endereco, Estado.SHARED)
+                            resposta.estado = Estado.FORWARD
+                        elif resposta.estado == Estado.MODIFIED:
+                            self.memoria_principal.atualiza_bloco(resposta.dados, endereco)
+                            resposta.estado = Estado.FORWARD
+                            self.cache.carregar_linha(resposta.dados, endereco, Estado.SHARED)
+                        return cache.ler(endereco)[0]    
             # Se não encontrar o bloco nas caches dos outros processadores, busca na memória principal
-            self.cache.carregar_linha(self.memoria_principal.buscar_bloco(endereco), endereco)
-            return self.memoria_principal.ler(endereco), Resposta.MISS
+            print("Buscando bloco na memória principal...")
+            self.cache.carregar_linha(self.memoria_principal.buscar_bloco(endereco), endereco, Estado.EXCLUSIVE)
+            return self.memoria_principal.ler(endereco)
     
     def escrever(self, endereco: int, dado):
         '''
