@@ -36,11 +36,12 @@ class MemoriaCache:
 
     def procurar_linha(self, endereco: int):
         '''
-        Procura a linha que armazena o *endereco* na cache.
+        Procura a linha que armazena o *endereco* na cache, retornando a linha se encontrada.
+        Caso a linha não seja encontrada, ou seja inválida, retorna None.
         '''
         tag = endereco // self.tamanho_linha
         for i in range(self.qnt_linhas):
-            if self.memoria[i].tag == tag:
+            if self.memoria[i].tag == tag and self.memoria[i].estado != Estado.INVALID:
                 return self.memoria[i]
         return None
 
@@ -51,10 +52,10 @@ class MemoriaCache:
         '''
         linha = self.procurar_linha(endereco)
         posicao = endereco % self.tamanho_linha
-        if linha is not None:
+        if linha is not None and linha.estado != Estado.INVALID:
             return linha.dados[posicao], Resposta.HIT
         return None, Resposta.MISS
-    
+
     def carregar_linha(self, bloco, endereco: int, estado: Estado):
         '''
         Carrega o *bloco* da memória principal que possui o *endereco* para uma linha da cache.
@@ -62,6 +63,11 @@ class MemoriaCache:
         '''
         tag = endereco // self.tamanho_linha
         for i in range(self.qnt_linhas):
+            # Procura se a cache já possui o bloco
+            if self.memoria[i].tag == tag:
+                self.memoria[i].dados = bloco
+                self.memoria[i].estado = estado
+                return
             # Procura se a cache possui uma linha vazia
             if self.memoria[i].estado == Estado.INVALID:
                 self.memoria[i].tag = tag
@@ -79,12 +85,23 @@ class MemoriaCache:
                 self.fila.append(tag)
                 return
 
-    def envia_memoria(self, endereco: int):
+    def invalidar_linha(self, endereco: int):
         '''
-        Envia o bloco da cache para a memória principal.
+        Invalida a linha que armazena o *endereco* na cache, tirando a linha da fila.
         '''
         tag = endereco // self.tamanho_linha
         for i in range(self.qnt_linhas):
             if self.memoria[i].tag == tag:
-                self.memoria[i].estado = Estado.FORWARD
+                self.memoria[i].estado = Estado.INVALID
+                self.fila.remove(tag)
+                return
+
+    def atualizar_linha(self, endereco: int, dado):
+        '''
+        Atualiza o dado na linha que armazena o *endereco* na cache.
+        '''
+        tag = endereco // self.tamanho_linha
+        for i in range(self.qnt_linhas):
+            if self.memoria[i].tag == tag:
+                self.memoria[i].dados[endereco % self.tamanho_linha] = dado
                 return

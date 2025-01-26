@@ -26,7 +26,7 @@ class MemoriaPrincipal:
         '''
         return self.memoria[self.tamanho_bloco * (endereco // self.tamanho_bloco): self.tamanho_bloco * (endereco // self.tamanho_bloco + 1)]
         
-    def atualiza_bloco(self, bloco, endereco: int):
+    def atualizar_bloco(self, bloco, endereco: int):
         '''
         Atualiza o bloco da memória principal que contém o *endereço*.
         '''
