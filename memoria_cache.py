@@ -21,13 +21,13 @@ class Linha:
         return str(self.dados) + ' | Bloco: ' + str(self.tag) + ' | Estado: '+ self.estado.value
 
 class MemoriaCache:
-    def __init__(self, tamanho: int, tamanho_linha: int, memoria_principal):
+    def __init__(self, tamanho: int, tamanho_linha: int, sistema):
         self.tamanho = tamanho
         self.tamanho_linha = tamanho_linha
         self.qnt_linhas = tamanho // tamanho_linha
         self.memoria = [Linha() for _ in range(self.qnt_linhas)]
         self.fila = []
-        self.memoria_principal = memoria_principal
+        self.sistema = sistema
     
     def __repr__(self):
         buffer = ''
@@ -77,11 +77,26 @@ class MemoriaCache:
         # Se a linha a ser substituída estiver no estado MODIFIED, atualiza o bloco na memória principal
         if self.memoria[index_fifo].estado == Estado.MODIFIED:
             endereco_substituido = self.memoria[index_fifo].tag * self.tamanho_linha
-            self.memoria_principal.atualizar_bloco(self.memoria[index_fifo].dados, endereco_substituido)
+            self.sistema.memoria_principal.atualizar_bloco(self.memoria[index_fifo].dados, endereco_substituido)
+        # Se a linha a ser substituída estiver no estado FORWARD, alguma outra cache que possui o bloco e
+        # está no estado SHARED, irá para o estado FORWARD
+        elif self.memoria[index_fifo].estado == Estado.FORWARD:
+            self.promover_shared_para_forward(self.memoria[index_fifo].tag)
         self.memoria[index_fifo].tag = tag
         self.memoria[index_fifo].dados = bloco
         self.memoria[index_fifo].estado = estado
         self.fila.append(index_fifo)
+
+    def promover_shared_para_forward(self, tag: int):
+        '''
+        Promove uma linha SHARED para FORWARD em outra cache que compartilha a mesma linha.
+        '''
+        for cache in self.sistema.caches:
+            if cache != self:
+                for linha in cache.memoria:
+                    if linha.tag == tag and linha.estado == Estado.SHARED:
+                        linha.estado = Estado.FORWARD
+                        return
 
     def invalidar_linha(self, endereco: int):
         '''
