@@ -1,3 +1,7 @@
+# Trabalho Prático – Simulador Extensões Protocolo MESI em uma coleção de figurinhas
+# Nome: GABRIEL LIBARDI LULU 	RA: 134728
+# Nome: MATEUS SCARPIN RIBEIRO	RA: 128459
+
 from sistema import Sistema
 import random
 import figurinhas

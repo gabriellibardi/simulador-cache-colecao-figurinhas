@@ -21,12 +21,13 @@ class Linha:
         return str(self.dados) + ' | Bloco: ' + str(self.tag) + ' | Estado: '+ self.estado.value
 
 class MemoriaCache:
-    def __init__(self, tamanho: int, tamanho_linha: int):
+    def __init__(self, tamanho: int, tamanho_linha: int, memoria_principal):
         self.tamanho = tamanho
         self.tamanho_linha = tamanho_linha
         self.qnt_linhas = tamanho // tamanho_linha
         self.memoria = [Linha() for _ in range(self.qnt_linhas)]
         self.fila = []
+        self.memoria_principal = memoria_principal
     
     def __repr__(self):
         buffer = ''
@@ -60,30 +61,27 @@ class MemoriaCache:
         '''
         Carrega o *bloco* da memória principal que possui o *endereco* para uma linha da cache.
         Se a cache estiver cheia, aplica a política de substituição FIFO.
+        Caso a linha a ser substituída esteja no estado MODIFIED, atualiza o bloco na memória principal.
         '''
         tag = endereco // self.tamanho_linha
         for i in range(self.qnt_linhas):
-            # Procura se a cache já possui o bloco
-            if self.memoria[i].tag == tag:
-                self.memoria[i].dados = bloco
-                self.memoria[i].estado = estado
-                return
-            # Procura se a cache possui uma linha vazia
+            # Procura se a cache possui uma linha inválida
             if self.memoria[i].estado == Estado.INVALID:
                 self.memoria[i].tag = tag
-                self.memoria[i].dados = bloco
+                self.memoria[i].dados = bloco.copy()
                 self.memoria[i].estado = estado
-                self.fila.append(tag)
+                self.fila.append(i)
                 return
         # Se a cache estiver cheia, aplica a política de substituição FIFO
-        tag_antiga = self.fila.pop(0)
-        for i in range(self.qnt_linhas):
-            if self.memoria[i].tag == tag_antiga:
-                self.memoria[i].tag = tag
-                self.memoria[i].dados = bloco
-                self.memoria[i].estado = estado
-                self.fila.append(tag)
-                return
+        index_fifo = self.fila.pop(0)
+        # Se a linha a ser substituída estiver no estado MODIFIED, atualiza o bloco na memória principal
+        if self.memoria[index_fifo].estado == Estado.MODIFIED:
+            endereco_substituido = self.memoria[index_fifo].tag * self.tamanho_linha
+            self.memoria_principal.atualizar_bloco(self.memoria[index_fifo].dados, endereco_substituido)
+        self.memoria[index_fifo].tag = tag
+        self.memoria[index_fifo].dados = bloco
+        self.memoria[index_fifo].estado = estado
+        self.fila.append(index_fifo)
 
     def invalidar_linha(self, endereco: int):
         '''
@@ -93,7 +91,8 @@ class MemoriaCache:
         for i in range(self.qnt_linhas):
             if self.memoria[i].tag == tag:
                 self.memoria[i].estado = Estado.INVALID
-                self.fila.remove(tag)
+                if i in self.fila:
+                    self.fila.remove(i)
                 return
 
     def atualizar_linha(self, endereco: int, dado):

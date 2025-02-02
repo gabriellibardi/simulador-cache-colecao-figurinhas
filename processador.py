@@ -38,21 +38,22 @@ class Processador:
                 print(self.memoria_principal)
             # Ler
             elif escolha == '1':
-                try:
-                    endereco = int(input("Endereço: "))
-                    print()
-                    resultado = self.ler(endereco)
-                    print(f"\nValor: {resultado}")
-                except:
-                    print("\n\033[91mEndereço Inválido.\033[00m")
+                # try:
+                endereco = int(input("Endereço: "))
+                print()
+                resultado = self.ler(endereco)
+                print(f"\nValor: {resultado}")
+                # except:
+                #     print("\n\033[91mEndereço Inválido.\033[00m")
             # Escrever
             elif escolha == '2':
-                try:
-                    endereco = int(input("Endereço: "))
-                    if endereco >= self.memoria_principal.tamanho:
-                        raise ValueError(f"Endereço {endereco} fora dos limites da memória.")
-                except:
-                    print("\n\033[91mEndereço Inválido.\033[00m")
+                # try:
+                endereco = int(input("Endereço: "))
+                if endereco >= self.memoria_principal.tamanho:
+                    raise ValueError(f"Endereço {endereco} fora dos limites da memória.")
+                # except:
+                #     print("\n\033[91mEndereço Inválido.\033[00m")
+                    # continue
                 dado = input(f"Número da figurinha (1 até {len(self.sistema.total_figurinhas)}): ")
                 if not dado.isdigit() or int(dado) < 1 or int(dado) > len(self.sistema.total_figurinhas):
                     print("\n\033[91mNúmero da figurinha inválido.\033[00m")
@@ -69,10 +70,10 @@ class Processador:
         '''
         resposta = self.cache.ler(endereco)
         if resposta[1] == Resposta.HIT:
-            print("\033[92mHit\033[00m")
+            print("\033[92mRead Hit\033[00m")
             return resposta[0]
         else: # MISS
-            print("\033[91mMiss\033[00m")
+            print("\033[91mRead Miss\033[00m")
             # Procura o bloco nas caches dos outros processadores
             print("\nBuscando bloco nas outras caches...")
             for cache in self.sistema.caches:
@@ -101,7 +102,7 @@ class Processador:
         '''
         linha = self.cache.procurar_linha(endereco)
         if linha is not None: # HIT
-            print("\033[92mHit\033[00m")
+            print("\033[92mWrite Hit\033[00m")
             if linha.estado == Estado.MODIFIED: # O bloco está na cache e já foi modificado
                 linha.dados[endereco % self.cache.tamanho_linha] = dado
             elif linha.estado == Estado.EXCLUSIVE: # O bloco está na cache e é exclusivo
@@ -117,7 +118,7 @@ class Processador:
                 linha.dados[endereco % self.cache.tamanho_linha] = dado
                 linha.estado = Estado.MODIFIED
         else: # MISS
-            print("\033[91mMiss\033[00m")
+            print("\033[91mWrite Miss\033[00m")
             # Procura o bloco nas caches dos outros processadores
             print("\nBuscando bloco nas outras caches...")
             for cache in self.sistema.caches:
